@@ -4,7 +4,10 @@
 This github repository summarizes the progress made in the VSD-HDP tapeout program. Quick links:
 
 [Day 0](#day-0)
+
 [Day 1](#day-1)
+
+[Day 2](#day-2)
 
 ## Day 0
 
@@ -192,7 +195,7 @@ yosys> show
  Below is the screenshot of the synthesized design:
 	
 	
- <img width="504" alt="Screen Shot 2023-05-09 at 9 56 15 PM" src="https://raw.githubusercontent.com/unixjet/VSDSquadron-assets/main/day1/02.png">
+ <img width="504" alt="Screen Shot 2023-05-09 at 9 56 15 PM" src="
 
 	
  I used the following commands to generate the netlist:
@@ -202,7 +205,226 @@ yosys> show
  ```
  
  Below is the screenshot of the generated netlist:
- <img width="636" alt="Screen Shot 2023-05-09 at 10 04 07 PM" src="https://raw.githubusercontent.com/unixjet/VSDSquadron-assets/main/day1/03.png">
+ <img width="636" alt="Screen Shot 2023-05-09 at 10 04 07 PM" src="
  
  </details>
+	
+## Day 2
+
+<details>
+ <summary> Summary </summary>
+
+I first synthesized a multiple module (made of two submodules) at the multiple module level (both in hierarchical and flattened forms) then at the submodule level. Synthesis at the submodule level is important for two reasons: 1-) when we have multiple instances of same module (we synthesize once and replicate this netlist multiple times and stitch together the replicas to get the multiple module netlist, and 2-) when we want to divide and conquer (in massive designs) so that the tool can generate a portion by portion of the overall netlist and then we can stitch together the netlist portions to get the multiple module netlist.
+After that, I sumulated the different flop designs using iverilog and gtkwave, then synthesized the designs.
+Finally, I synthesized 2 designs that were special; their synthesis used optimizations.
+
+</details>	
+	
+<details>
+ <summary> Verilog codes </summary>
+The verilog codes of the multiple module (multiple_modules.v), the D-flipflop with asynchronous reset (dff_asyncres.v), the D-flipflop with asynchronous set (dff_async_set.v), the D-flipflop with synchronous reset (dff_syncres.v), their respective testbenches (tb_*), mult_2.v and mult_8.v are taken from https://github.com/kunalg123/sky130RTLDesignAndSynthesisWorkshop.git
+
+</details>
+	
+<details>
+ <summary> Synthesis: multiple_modules level </summary>
+		
+I used the following commands to synthesize and view the design of the hierarchical multiple module:
+		
+```bash		
+yosys> read_liberty -lib <path to sky130_fd_sc_hd__tt_025C_1v80.lib>
+yosys> read_verilog <name of verilog file: multiple_modules.v>
+yosys> synth -top <name: multiple_modules>
+yosys> abc -liberty <path to sky130_fd_sc_hd__tt_025C_1v80.lib>
+yosys> show <name: multiple_modules>
+yosys> write_verilog -noattr <name: multiple_modules_hier.v>
+```
+Below is the screenshot of the generated hierarchical design:
+		
+<img width="530" alt="hier" src="https://raw.githubusercontent.com/unixjet/VSDSquadron-assets/main/day2/01.png">
+	
+Below is the screenshot of the generated hierarchical netlist:
+		
+<img width="645" alt="hiernetlist" src="https://raw.githubusercontent.com/unixjet/VSDSquadron-assets/main/day2/02.png">
+
+I used the following additional commands to synthesize and view the design of the flattened multiple module:
+		
+```bash
+yosys> flatten
+yosys> write_verilog -noattr <name: multiple_modules_flat.v>
+```	
+Below is the screenshot of the generated flattened design:
+		
+<img width="574" alt="flatten" src="https://raw.githubusercontent.com/unixjet/VSDSquadron-assets/main/day2/05.png">
+
+Below is the screenshot of the generated flattened netlist:
+		
+<img width="645" alt="flattennetlist" src="https://raw.githubusercontent.com/unixjet/VSDSquadron-assets/main/day2/04.png">
+
+</details>
+<details>
+ <summary> Synthesis: sub_module1 level </summary>
+		
+I used the following commands to view the synthesized design of the submodule:
+		
+```bash		
+yosys> read_liberty -lib <path to sky130_fd_sc_hd__tt_025C_1v80.lib>
+yosys> read_verilog <name of verilog file: multiple_modules.v>
+yosys> synth -top <name: sub_module1>
+yosys> abc -liberty <path to sky130_fd_sc_hd__tt_025C_1v80.lib>
+yosys> show <name: sub_module1>
+```
+	
+Below is the screenshot of the generated design:
+		
+<img width="418" alt="synth_submodule1" src="https://raw.githubusercontent.com/unixjet/VSDSquadron-assets/main/day2/06.png">
+		
+</details>
+<details>
+<summary> Simulation: dff with asynchronous reset </summary>
+
+I used the following commands to simulate the RTL design of the dff with asynchronous reset:
+	
+```bash	
+iverilog <name verilog: dff_asyncres.v> <name testbench: tb_dff_asyncres.v>
+./a.out
+gtkwave <name vcd file: tb_dff_asyncres.vcd>
+```	
+	
+Below is the screenshot of the simulation:
+	
+<img width="466" alt="asyncres" src="https://raw.githubusercontent.com/unixjet/VSDSquadron-assets/main/day2/07.png">
+	
+</details>
+<details>
+<summary> Simulation: dff with asynchronous set </summary>
+I used the following commands to simulate the RTL design of the dff with asynchronous set:
+	
+```bash	
+iverilog <name verilog: dff_async_set.v> <name testbench: tb_dff_async_set.v>
+./a.out
+gtkwave <name vcd file: tb_dff_async_set.vcd>
+```
+	
+Below is the screenshot of the simulation:
+	
+<img width="489" alt="asyncset" src="https://raw.githubusercontent.com/unixjet/VSDSquadron-assets/main/day2/08.png">
+
+</details>
+<details>
+<summary> Simulation: dff with synchronous reset </summary>
+	
+I used the following commands to simulate the RTL design of the dff with synchronous reset:
+	
+```bash	
+iverilog <name verilog: dff_syncres.v> <name testbench: tb_dff_syncres.v>
+./a.out
+gtkwave <name vcd file: tb_dff_syncres.vcd>
+```	
+	
+Below is the screenshot of the simulation:
+	
+<img width="476" alt="syncres" src="https://raw.githubusercontent.com/unixjet/VSDSquadron-assets/main/day2/09.png">
+
+</details>
+<details>
+ <summary> Synthesis: dff with asynchronous reset </summary>
+
+I used the following commands to synthesize the design:
+```bash
+yosys> read_liberty -lib <path to sky130_fd_sc_hd__tt_025C_1v80.lib>
+yosys> read_verilog <name of verilog file: dff_asyncres.v>
+yosys> synth -top <name: dff_asyncres>
+yosys> dfflibmap -liberty <path to sky130_fd_sc_hd__tt_025C_1v80.lib>
+yosys> abc -liberty <path to sky130_fd_sc_hd__tt_025C_1v80.lib>
+yosys> show <name: dff_asyncres>
+```
+Below is the screenshot of the synthesized design:
+	
+<img width="415" alt="asyncressynth" src="https://raw.githubusercontent.com/unixjet/VSDSquadron-assets/main/day2/10.png">
+	
+</details>
+<details>
+ <summary> Synthesis: dff with asynchronous set </summary>
+
+I used the following commands to synthesize the design:
+	
+```bash
+yosys> read_liberty -lib <path to sky130_fd_sc_hd__tt_025C_1v80.lib>
+yosys> read_verilog <name of verilog file: dff_async_set.v>
+yosys> synth -top <name: dff_async_set>
+yosys> dfflibmap -liberty <path to sky130_fd_sc_hd__tt_025C_1v80.lib>
+yosys> abc -liberty <path to sky130_fd_sc_hd__tt_025C_1v80.lib>
+yosys> show <name: dff_async_set>
+```
+Below is the screenshot of the synthesized design:
+	
+<img width="415" alt="asyncsetsynth" src="https://raw.githubusercontent.com/unixjet/VSDSquadron-assets/main/day2/11.png">
+	
+</details>
+<details>
+ <summary> Synthesis: dff with synchronous reset </summary>
+	
+I used the following commands to synthesize the design:
+```bash
+yosys> read_liberty -lib <path to sky130_fd_sc_hd__tt_025C_1v80.lib>
+yosys> read_verilog <name of verilog file: dff_syncres.v>
+yosys> synth -top <name: dff_syncres>
+yosys> dfflibmap -liberty <path to sky130_fd_sc_hd__tt_025C_1v80.lib>
+yosys> abc -liberty <path to sky130_fd_sc_hd__tt_025C_1v80.lib>
+yosys> show <name: dff_syncres>
+```
+Below is the screenshot of the synthesized design:
+	
+<img width="418" alt="syncressynth" src="https://raw.githubusercontent.com/unixjet/VSDSquadron-assets/main/day2/12.png">
+
+</details>
+<details>
+ <summary> Synthesis: mult_2.v </summary>
+	
+I used the following commands to synthesize and view the design:
+	
+```bash
+yosys> read_liberty -lib <path to sky130_fd_sc_hd__tt_025C_1v80.lib>
+yosys> read_verilog <name of verilog file: mult_2.v>
+yosys> synth -top <name: mul2>
+yosys> abc -liberty <path to sky130_fd_sc_hd__tt_025C_1v80.lib>
+yosys> show <name: mul2>
+yosys> write_verilog -noattr <name: mul2_net.v>
+```
+	
+Below is the screenshot of the synthesized design, note that no hardware was used (no cells are synthesised) as multiplying a 3-bit input by a power of two is equivalent to shifting for output:
+	
+<img width="453" alt="mul2" src="https://raw.githubusercontent.com/unixjet/VSDSquadron-assets/main/day2/13.png">
+	
+Below is the screenshot of the netlist:
+	
+<img width="636" alt="mul2_net" src="https://raw.githubusercontent.com/unixjet/VSDSquadron-assets/main/day2/14.png">
+	
+
+</details>
+<details>
+ <summary> Synthesis: mult_8.v </summary>
+	
+I used the following commands to synthesize and view the design:
+	
+```bash
+yosys> read_liberty -lib <path to sky130_fd_sc_hd__tt_025C_1v80.lib>
+yosys> read_verilog <name of verilog file: mult_8.v>
+yosys> synth -top <name: mult8>
+yosys> abc -liberty <path to sky130_fd_sc_hd__tt_025C_1v80.lib>
+yosys> show <name: mult8>
+yosys> write_verilog -noattr <name: mult8_net.v>
+```
+	
+Below is the screenshot of the synthesized design, note that no hardware was used (no cells are synthesised) as multiplying a 3-bit input (special case) by a nine is equivalent to replicating the input twice for output:
+	
+<img width="414" alt="mult8" src="https://raw.githubusercontent.com/unixjet/VSDSquadron-assets/main/day2/15.png">
+	
+Below is the screenshot of the netlist:
+	
+<img width="645" alt="mult8_net" src="https://raw.githubusercontent.com/unixjet/VSDSquadron-assets/main/day2/16.png">
+
+
+</details>
 	

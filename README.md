@@ -185,7 +185,7 @@ The verilog codes of the 2x1 mux (good_mux.v) and its testbench (tb_good_mux.v) 
  ```bash
 yosys> read_liberty -lib <path to lib file>
 yosys> read_verilog <path to verilog file>
-yosys> synth -top <top_module_name>
+yosys> synth -top <top_module_name: good_mux>
 yosys> abc -liberty <path to lib file>
 yosys> show
  ```
@@ -197,8 +197,8 @@ yosys> show
 	
  I used the following commands to generate the netlist:
  ```bash
- yosys> write_verilog <file_name_netlist.v>
- yosys> write_verilog -noattr <file_name_netlist.v>
+ yosys> write_verilog <file_name: good_mux_net.v>
+ yosys> write_verilog -noattr <file_name: good_mux_net.v>
  ```
  
  Below is the screenshot of the generated netlist:

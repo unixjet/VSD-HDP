@@ -195,7 +195,7 @@ yosys> show
  Below is the screenshot of the synthesized design:
 	
 	
- <img width="504" alt="Screen Shot 2023-05-09 at 9 56 15 PM" src="
+ <img width="504" alt="Screen Shot 2023-05-09 at 9 56 15 PM" src="https://raw.githubusercontent.com/unixjet/VSDSquadron-assets/main/day1/02.png">
 
 	
  I used the following commands to generate the netlist:
@@ -205,7 +205,7 @@ yosys> show
  ```
  
  Below is the screenshot of the generated netlist:
- <img width="636" alt="Screen Shot 2023-05-09 at 10 04 07 PM" src="
+ <img width="636" alt="Screen Shot 2023-05-09 at 10 04 07 PM" src="https://raw.githubusercontent.com/unixjet/VSDSquadron-assets/main/day1/03.png">
  
  </details>
 	

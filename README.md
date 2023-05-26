@@ -11,6 +11,8 @@ This github repository summarizes the progress made in the VSD-HDP tapeout progr
 
 [Day 3](#day-3)
 
+[Day 4](#day-4)
+
 ## Day 0
 
 I installed the following tools:
@@ -779,3 +781,164 @@ Below is the screenshot of the obtained optimized design, and 3 flipflops are us
 	
 </details>
 
+## Day 4
+
+<details>
+ <summary> Summary </summary>
+
+I have performed Gate Level Simulation (GLS). GLS is when the testbench is run with the netlist as design under test to ensure there are no synthesis and simulation mismatches, and it is important as it 1-) verifies the logical correctness of the post-synthesis design and 2-) ensures the timing of design is met. Synthesis and simulation mismatches can happen due to a lot of reasons including missing sensitivity list (some signal changes are not captured by the circuit because they are missing from the sensitivity list), blocking vs non-blocking assignments (inside an always block, "=" statements inside it are blocking meaning they are executed in order they are written, assignments (<=) on the other hand are non-blocking so they are executed in parallel => non-blocking should be used with sequential circuits. Note that the synthesis will yield same circuit with blocking and non-blockin; it will yield what would be obtained as if the statements where written in non-blocking format, so in case they weren't written as such a mismatch will occur with the simulation), and non-standard verilog coding.
+	
+</details>
+	
+<details>
+ <summary> Verilog codes </summary>
+The verilog codes (*_mux.v and blocking_caveat.v) are taken from https://github.com/kunalg123/sky130RTLDesignAndSynthesisWorkshop.git
+
+</details>
+	
+<details>
+ <summary> Simulation, synthesis, and GLS: ternary_operator_mux.v </summary>
+
+I used the below commands to simulate the design of ternary_operator_mux.v:
+	
+```bash
+iverilog <name verilog: ternary_operator_mux.v> <name testbench: tb_ternary_operator_mux.v>
+./a.out
+gtkwave tb_ternary_operator_mux.vcd
+```	
+
+Below is the screenshot of the obtained simulation, we can see that when sel is high y follows i1, and when sel is low y follows i0:
+
+<img width="453" alt="ternary_operator_mux" src="https://raw.githubusercontent.com/unixjet/VSDSquadron-assets/main/day4/01.png">
+
+I used the below commands to synthesize the design into a netlist and view the synthesized design of ternary_operator_mux.v:
+	
+```bash
+yosys> read_liberty -lib <path to sky130_fd_sc_hd__tt_025C_1v80.lib>
+yosys> read_verilog <name of verilog file: ternary_operator_mux.v>
+yosys> synth -top <name: ternary_operator_mux>
+yosys> abc -liberty <path to sky130_fd_sc_hd__tt_025C_1v80.lib>
+yosys> write_verilog -noattr <name of netlist: ternary_operator_mux_net.v>
+yosys> show
+```
+	
+Below is the screenshot of the obtained design:
+
+<img width="442" alt="ternary_operator_mux_synth" src="https://raw.githubusercontent.com/unixjet/VSDSquadron-assets/main/day4/02.png">
+
+Below is the screenshot of the obtained netlist:
+	
+<img width="670" alt="mux_net" src="https://raw.githubusercontent.com/unixjet/VSDSquadron-assets/main/day4/03.png">
+
+I used the below commands to carry out GLS of ternary_operator_mux.v:
+	
+```bash
+iverilog <path to verilog model: ../my_lib/verilog_model/primitives.v> <path to sky130_fd_sc_hd.v: ../my_lib/verilog_model/sky130_fd_sc_hd.v> <name netlist: ternary_operator_mux_net.v> <name testbench: tb_ternary_operator_mux.v>
+./a.out
+gtkwave tb_ternary_operator_mux.vcd
+```	
+	
+Below is the screenshot of the obtained simulation, and this matches with pre-synthesis simulation:
+	
+<img width="546" alt="gls_ternary" src="https://raw.githubusercontent.com/unixjet/VSDSquadron-assets/main/day4/04.png">
+
+	
+</details>
+
+<details>
+ <summary> Simulation, synthesis, and GLS: bad_mux.v </summary>
+
+I used the below commands to simulate the design of bad_mux.v:
+	
+```bash
+iverilog <name verilog: bad_mux.v> <name testbench: tb_bad_mux.v>
+./a.out
+gtkwave tb_bad_mux.vcd
+```	
+
+Below is the screenshot of the obtained simulation, we can see that when inputs change, y is not evaluated which is wrong behavior:
+
+<img width="577" alt="bad_mux" src="https://raw.githubusercontent.com/unixjet/VSDSquadron-assets/main/day4/05.png">
+
+
+I used the below commands to synthesize the design into a netlist and view the synthesized design of bad_mux.v:
+	
+```bash
+yosys> read_liberty -lib <path to sky130_fd_sc_hd__tt_025C_1v80.lib>
+yosys> read_verilog <name of verilog file: bad_mux.v>
+yosys> synth -top <name: bad_mux>
+yosys> abc -liberty <path to sky130_fd_sc_hd__tt_025C_1v80.lib>
+yosys> write_verilog -noattr <name of netlist: bad_mux_net.v>
+yosys> show
+```
+	
+Below is the screenshot of the obtained design:
+
+<img width="444" alt="bad_mux_synth" src="https://raw.githubusercontent.com/unixjet/VSDSquadron-assets/main/day4/06.png">
+
+	
+Below is the screenshot of the obtained netlist:
+
+<img width="681" alt="bad_mux_net" src="https://raw.githubusercontent.com/unixjet/VSDSquadron-assets/main/day4/07.png">
+	
+I used the below commands to carry out GLS of bad_mux.v:
+	
+```bash
+iverilog <path to verilog model: ../my_lib/verilog_model/primitives.v> <path to sky130_fd_sc_hd.v: ../my_lib/verilog_model/sky130_fd_sc_hd.v> <name netlist: bad_mux_net.v> <name testbench: tb_bad_mux.v>
+./a.out
+gtkwave tb_bad_mux.vcd
+```	
+	
+Below is the screenshot of the obtained simulation, and this mismatches with pre-synthesis simulation:
+	
+<img width="572" alt="gls" src="https://raw.githubusercontent.com/unixjet/VSDSquadron-assets/main/day4/08.png">
+	
+</details>
+
+<details>
+ <summary> Simulation, synthesis, and GLS: blocking_caveat.v </summary>
+
+I used the below commands to simulate the design of blocking_caveat.v:
+	
+```bash
+iverilog <name verilog: blocking_caveat.v> <name testbench: tb_blocking_caveat.v>
+./a.out
+gtkwave tb_blocking_caveat.vcd
+```	
+
+Below is the screenshot of the obtained simulation, and as we can see d is seeing the precious values, and hence it is acting as if there was a flop in the circuit which is not the case (incorrect behavior):
+
+<img width="599" alt="blocking_caveat" src="https://raw.githubusercontent.com/unixjet/VSDSquadron-assets/main/day4/09.png">
+
+I used the below commands to synthesize the design into a netlist and view the synthesized design of blocking_caveat.v:
+	
+```bash
+yosys> read_liberty -lib <path to sky130_fd_sc_hd__tt_025C_1v80.lib>
+yosys> read_verilog <name of verilog file: blocking_caveat.v>
+yosys> synth -top <name: blocking_caveat>
+yosys> abc -liberty <path to sky130_fd_sc_hd__tt_025C_1v80.lib>
+yosys> write_verilog -noattr <name of netlist: blocking_caveat_net.v>
+yosys> show
+```
+	
+Below is the screenshot of the obtained design:
+
+<img width="435" alt="blocking_caveat_synth" src="https://raw.githubusercontent.com/unixjet/VSDSquadron-assets/main/day4/10.png">
+	
+Below is the screenshot of the obtained netlist:
+
+<img width="674" alt="blocking_caveat_net" src="https://raw.githubusercontent.com/unixjet/VSDSquadron-assets/main/day4/11.png">
+
+I used the below commands to carry out GLS of blocking_caveat.v:
+	
+```bash
+iverilog <path to verilog model: ../my_lib/verilog_model/primitives.v> <path to verilog model: ../my_lib/verilog_model/sky130_fd_sc_hd.v> <name netlist: blocking_caveat_net.v> <name testbench: tb_blocking_caveat.v>
+./a.out
+gtkwave tb_blocking_caveat.vcd
+```	
+	
+Below is the screenshot of the obtained simulation, and this mismatches with pre-synthesis simulation due to blocking statement:
+	
+<img width="469" alt="blocking_conveat_gls" src="https://raw.githubusercontent.com/unixjet/VSDSquadron-assets/main/day4/12.png">
+	
+</details>

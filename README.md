@@ -767,7 +767,7 @@ I used the below commands to view the synthesized design of counter_opt2.v with 
 ```bash
 yosys> read_liberty -lib <path to sky130_fd_sc_hd__tt_025C_1v80.lib>
 yosys> read_verilog <name of verilog file: counter_opt2.v>
-yosys> synth -top <name: counter_opt2>
+yosys> synth -top <name: counter_opt>
 yosys> dfflibmap -liberty <path to sky130_fd_sc_hd__tt_025C_1v80.lib>
 yosys> abc -liberty <path to sky130_fd_sc_hd__tt_025C_1v80.lib>
 yosys> show

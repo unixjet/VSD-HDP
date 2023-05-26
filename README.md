@@ -9,6 +9,8 @@ This github repository summarizes the progress made in the VSD-HDP tapeout progr
 
 [Day 2](#day-2)
 
+[Day 3](#day-3)
+
 ## Day 0
 
 I installed the following tools:
@@ -428,3 +430,352 @@ Below is the screenshot of the netlist:
 
 </details>
 	
+## Day 3
+	
+<details>
+ <summary> Summary </summary>
+
+I have synthesized designs with optimizations. Combinational logic optimizations include 1-) constant propagation (when the combination is just propagating a constant) and 2-) boolean logic optimization (when boolean rules are used to simplify the expression). Sequential logic optimizations include 1-) sequential constant propagation (when constant is propagated with clock involved), 2-) state optimization (when unused states are optimized), 3-) retiming (when logic is split to decrease timing of the different logic portions and increase frequency), and 4-) sequential logic cloning (when physical aware synthesis is done to optimize the floop plan)
+
+</details>	
+	
+<details>
+ <summary> Verilog codes </summary>
+
+The verilog codes used (opt_*, dff_const*, tb_dff_const*, and counter_opt*) are taken from https://github.com/kunalg123/sky130RTLDesignAndSynthesisWorkshop.git
+
+</details>
+	
+<details>
+ <summary> Combinational logic optimizations: opt_check.v </summary>
+I used the below commands to view the synthesized design of opt_check.v with optimizations:
+	
+```bash
+yosys> read_liberty -lib <path to sky130_fd_sc_hd__tt_025C_1v80.lib>
+yosys> read_verilog <name of verilog file: opt_check.v>
+yosys> synth -top <name: opt_check>
+yosys> opt_clean -purge
+yosys> abc -liberty <path to sky130_fd_sc_hd__tt_025C_1v80.lib>
+yosys> show
+```
+	
+Below is the screenshot of the obtained optimized design, as we can see a 2-input and gate is realized as was expected when optimizations are applied:
+	
+<img width="676" alt="opt_check" src="https://raw.githubusercontent.com/unixjet/VSDSquadron-assets/main/day3/01.png">
+
+</details>
+	
+<details>
+ <summary> Combinational logic optimizations: opt_check2.v </summary>
+	I used the below commands to view the synthesized design of opt_check2.v with optimizations:
+	
+```bash
+yosys> read_liberty -lib <path to sky130_fd_sc_hd__tt_025C_1v80.lib>
+yosys> read_verilog <name of verilog file: opt_check2.v>
+yosys> synth -top <name: opt_check2>
+yosys> opt_clean -purge
+yosys> abc -liberty <path to sky130_fd_sc_hd__tt_025C_1v80.lib>
+yosys> show
+```
+Below is the screenshot of the obtained optimized design, as we can see a 2-input or gate is realized as was expected when optimizations are applied:
+	
+<img width="676" alt="opt_check1" src="https://raw.githubusercontent.com/unixjet/VSDSquadron-assets/main/day3/02.png">
+
+
+</details>
+	
+<details>
+ <summary> Combinational logic optimizations: opt_check3.v </summary>
+	
+I used the below commands to view the synthesized design of opt_check3.v with optimizations:
+	
+```bash
+yosys> read_liberty -lib <path to sky130_fd_sc_hd__tt_025C_1v80.lib>
+yosys> read_verilog <name of verilog file: opt_check3.v>
+yosys> synth -top <name: opt_check3>
+yosys> opt_clean -purge
+yosys> abc -liberty <path to sky130_fd_sc_hd__tt_025C_1v80.lib>
+yosys> show
+```
+	
+Below is the screenshot of the obtained optimized design, as we can see a 3-input and gate is realized as was expected when optimizations are applied:
+	
+<img width="444" alt="opt_check3" src="https://raw.githubusercontent.com/unixjet/VSDSquadron-assets/main/day3/03.png">
+
+
+</details>
+	
+<details>
+ <summary> Combinational logic optimizations: opt_check4.v </summary>
+	
+I used the below commands to view the synthesized design of opt_check4.v with optimizations:
+	
+```bash
+yosys> read_liberty -lib <path to sky130_fd_sc_hd__tt_025C_1v80.lib>
+yosys> read_verilog <name of verilog file: opt_check4.v>
+yosys> synth -top <name: opt_check4>
+yosys> opt_clean -purge
+yosys> abc -liberty <path to sky130_fd_sc_hd__tt_025C_1v80.lib>
+yosys> show
+```
+	
+Below is the screenshot of the obtained optimized design, as we can see a 2-input xnor gate is realized as was expected when optimizations are applied:
+	
+<img width="474" alt="opt_check4" src="https://raw.githubusercontent.com/unixjet/VSDSquadron-assets/main/day3/04.png">
+
+
+</details>
+		
+<details>
+ <summary> Combinational logic optimizations: multiple_module_opt.v </summary>
+	
+I used the below commands to view the synthesized design of multiple_module_opt.v with optimizations:
+	
+```bash
+yosys> read_liberty -lib <path to sky130_fd_sc_hd__tt_025C_1v80.lib>
+yosys> read_verilog <name of verilog file: multiple_module_opt.v>
+yosys> synth -top <name: multiple_module_opt>
+yosys> flatten 
+yosys> opt_clean -purge
+yosys> abc -liberty <path to sky130_fd_sc_hd__tt_025C_1v80.lib>
+yosys> show
+```
+	
+Below is the screenshot of the obtained optimized design, as we can see 2 and gates and 1 or gate are realized as was expected when optimizations are applied:
+	
+<img width="419" alt="multiple_module_opt" src="https://raw.githubusercontent.com/unixjet/VSDSquadron-assets/main/day3/05.png">
+
+
+
+</details>
+	
+<details>
+ <summary> Combinational logic optimizations: multiple_module_opt2.v </summary>
+	
+I used the below commands to view the synthesized design of multiple_module_opt2.v with optimizations:
+	
+```bash
+yosys> read_liberty -lib <path to sky130_fd_sc_hd__tt_025C_1v80.lib>
+yosys> read_verilog <name of verilog file: multiple_module_opt2.v>
+yosys> synth -top <name: multiple_module_opt2>
+yosys> flatten 
+yosys> opt_clean -purge
+yosys> abc -liberty <path to sky130_fd_sc_hd__tt_025C_1v80.lib>
+yosys> show
+```
+	
+Below is the screenshot of the obtained optimized design, as we can see no standard cells are realized as was expected when optimizations are applied:
+	
+<img width="421" alt="multiple_module_opt2" src="https://raw.githubusercontent.com/unixjet/VSDSquadron-assets/main/day3/06.png">
+
+
+
+</details>
+	
+<details>
+ <summary> Sequential logic optimizations: dff_const1.v </summary>
+	
+I used the below commands to simulate the design of dff_const1.v:
+	
+```bash
+iverilog <name verilog: dff_const1.v> <name testbench: tb_dff_const1.v>
+./a.out
+gtkwave tb_dff_const1.vcd
+```	
+
+Below is the screenshot of the obtained simulation, a we can see even when reset is zero, Q waits for next rising edge of clock:
+	
+<img width="578" alt="dff_const1" src="https://raw.githubusercontent.com/unixjet/VSDSquadron-assets/main/day3/07.png">
+
+	
+I used the below commands to view the synthesized design of dff_const1.v with optimizations:
+	
+```bash
+yosys> read_liberty -lib <path to sky130_fd_sc_hd__tt_025C_1v80.lib>
+yosys> read_verilog <name of verilog file: dff_const1.v>
+yosys> synth -top <name: dff_const1>
+yosys> dfflibmap -liberty <path to sky130_fd_sc_hd__tt_025C_1v80.lib>
+yosys> abc -liberty <path to sky130_fd_sc_hd__tt_025C_1v80.lib>
+yosys> show
+```
+	
+Below is the screenshot of the obtained optimized design:
+	
+<img width="506" alt="dff_const1_synth" src="https://raw.githubusercontent.com/unixjet/VSDSquadron-assets/main/day3/08.png">
+
+
+
+</details>
+	
+<details>
+ <summary> Sequential logic optimizations: dff_const2.v </summary>
+	
+I used the below commands to simulate the design of dff_const2.v:
+	
+```bash
+iverilog <name verilog: dff_const2.v> <name testbench: tb_dff_const2.v>
+./a.out
+gtkwave tb_dff_const2.vcd
+```	
+
+Below is the screenshot of the obtained simulation, as we can see Q is one regardless of the value of reset and clock:
+	
+<img width="629" alt="dff_const2" src="https://raw.githubusercontent.com/unixjet/VSDSquadron-assets/main/day3/09.png">
+
+I used the below commands to view the synthesized design of dff_const2.v with optimizations:
+	
+```bash
+yosys> read_liberty -lib <path to sky130_fd_sc_hd__tt_025C_1v80.lib>
+yosys> read_verilog <name of verilog file: dff_const2.v>
+yosys> synth -top <name: dff_const2>
+yosys> dfflibmap -liberty <path to sky130_fd_sc_hd__tt_025C_1v80.lib>
+yosys> abc -liberty <path to sky130_fd_sc_hd__tt_025C_1v80.lib>
+yosys> show
+```
+	
+Below is the screenshot of the obtained optimized design:
+	
+<img width="438" alt="dff_const2_synth" src="https://raw.githubusercontent.com/unixjet/VSDSquadron-assets/main/day3/10.png">
+
+
+</details>
+
+	
+<details>
+ <summary> Sequential logic optimizations: dff_const3.v </summary>
+	
+I used the below commands to simulate the design of dff_const3.v:
+	
+```bash
+iverilog <name verilog: dff_const3.v> <name testbench: tb_dff_const3.v>
+./a.out
+gtkwave tb_dff_const3.vcd
+```	
+
+Below is the screenshot of the obtained simulation, as we can see Q does not follow Q1 immediately:
+	
+<img width="574" alt="dff_const3" src="https://raw.githubusercontent.com/unixjet/VSDSquadron-assets/main/day3/11.png">
+
+I used the below commands to view the synthesized design of dff_const3.v:
+	
+```bash
+yosys> read_liberty -lib <path to sky130_fd_sc_hd__tt_025C_1v80.lib>
+yosys> read_verilog <name of verilog file: dff_const3.v>
+yosys> synth -top <name: dff_const3>
+yosys> dfflibmap -liberty <path to sky130_fd_sc_hd__tt_025C_1v80.lib>
+yosys> abc -liberty <path to sky130_fd_sc_hd__tt_025C_1v80.lib>
+yosys> show
+```
+	
+Below is the screenshot of the obtained design, the 2 flipflops are retained and optimization could not remove any of them:
+
+<img width="651" alt="dff_const3synth" src="https://raw.githubusercontent.com/unixjet/VSDSquadron-assets/main/day3/12.png">
+
+
+</details>
+	
+<details>
+ <summary> Sequential logic optimizations: dff_const4.v </summary>
+	
+I used the below commands to simulate the design of dff_const4.v:
+	
+```bash
+iverilog <name verilog: dff_const4.v> <name testbench: tb_dff_const4.v>
+./a.out
+gtkwave tb_dff_const4.vcd
+```	
+
+Below is the screenshot of the obtained simulation, as we can see Q and Q1 are one regardless of clk and reset:
+
+<img width="614" alt="dff_const4" src="https://raw.githubusercontent.com/unixjet/VSDSquadron-assets/main/day3/13.png">
+	
+I used the below commands to view the synthesized design of dff_const4.v with optimizations:
+	
+```bash
+yosys> read_liberty -lib <path to sky130_fd_sc_hd__tt_025C_1v80.lib>
+yosys> read_verilog <name of verilog file: dff_const4.v>
+yosys> synth -top <name: dff_const4>
+yosys> dfflibmap -liberty <path to sky130_fd_sc_hd__tt_025C_1v80.lib>
+yosys> abc -liberty <path to sky130_fd_sc_hd__tt_025C_1v80.lib>
+yosys> show
+```
+	
+Below is the screenshot of the obtained optimized design, and no hardware was used as expected:
+	
+<img width="424" alt="dff_const4_synth" src="https://raw.githubusercontent.com/unixjet/VSDSquadron-assets/main/day3/14.png">
+
+</details>
+	
+<details>
+ <summary> Sequential logic optimizations: dff_const5.v </summary>
+	
+I used the below commands to simulate the design of dff_const5.v:
+	
+```bash
+iverilog <name verilog: dff_const5.v> <name testbench: tb_dff_const5.v>
+./a.out
+gtkwave tb_dff_const5.vcd
+```	
+
+Below is the screenshot of the obtained simulation, as we can see when reset is zero, Q1 becomes one on the next rising edge of clk, and Q follows Q1 on the next rising edge of clk:
+
+<img width="604" alt="dff_const5" src="https://raw.githubusercontent.com/unixjet/VSDSquadron-assets/main/day3/15.png">
+
+	
+I used the below commands to view the synthesized design of dff_const5.v with optimizations:
+	
+```bash
+yosys> read_liberty -lib <path to sky130_fd_sc_hd__tt_025C_1v80.lib>
+yosys> read_verilog <name of verilog file: dff_const5.v>
+yosys> synth -top <name: dff_const5>
+yosys> dfflibmap -liberty <path to sky130_fd_sc_hd__tt_025C_1v80.lib>
+yosys> abc -liberty <path to sky130_fd_sc_hd__tt_025C_1v80.lib>
+yosys> show
+```
+	
+Below is the screenshot of the obtained optimized design, and the 2 flipflops are retained:
+	
+<img width="629" alt="dff_const5_synth" src="https://raw.githubusercontent.com/unixjet/VSDSquadron-assets/main/day3/16.png">
+
+</details>
+	
+<details>
+ <summary> Sequential logic optimizations for unused outputs: counter_opt.v </summary>
+	
+I used the below commands to view the synthesized design of counter_opt.v with optimizations:
+	
+```bash
+yosys> read_liberty -lib <path to sky130_fd_sc_hd__tt_025C_1v80.lib>
+yosys> read_verilog <name of verilog file: counter_opt.v>
+yosys> synth -top <name: counter_opt>
+yosys> dfflibmap -liberty <path to sky130_fd_sc_hd__tt_025C_1v80.lib>
+yosys> abc -liberty <path to sky130_fd_sc_hd__tt_025C_1v80.lib>
+yosys> show
+```
+	
+Below is the screenshot of the obtained optimized design, and the only used output (count[0]) is present and 1 flipflop is used:
+	
+<img width="684" alt="counter_opt" src="https://raw.githubusercontent.com/unixjet/VSDSquadron-assets/main/day3/17.png">
+	
+</details>
+	
+<details>
+ <summary> Sequential logic optimizations for 3 used outputs: counter_opt2.v </summary>
+	
+I used the below commands to view the synthesized design of counter_opt2.v with optimizations:
+	
+```bash
+yosys> read_liberty -lib <path to sky130_fd_sc_hd__tt_025C_1v80.lib>
+yosys> read_verilog <name of verilog file: counter_opt2.v>
+yosys> synth -top <name: counter_opt2>
+yosys> dfflibmap -liberty <path to sky130_fd_sc_hd__tt_025C_1v80.lib>
+yosys> abc -liberty <path to sky130_fd_sc_hd__tt_025C_1v80.lib>
+yosys> show
+```
+	
+Below is the screenshot of the obtained optimized design, and 3 flipflops are used in addition to the counting logic of all bits:
+	
+<img width="681" alt="counter_opt2" src="https://raw.githubusercontent.com/unixjet/VSDSquadron-assets/main/day3/18.png">
+	
+</details>
+
